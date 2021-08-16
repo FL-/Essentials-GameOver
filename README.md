@@ -5,7 +5,7 @@ This script is for Pokémon Essentials. When a switch is on, its activates a gam
 ![](Screens/screen.jpg)
 
 ## Compatibility
-Tested on Essentials v13 and v17.2. Doesn't work with v19 or above.
+Doesn't work on Essentials versions older than v19. To see other script versions, look at [all branches](../../branches/all).
 
 ## Installation
 Follow the [Script](/Script.rb) instructions. The sample script files are in [Files folder](/Files).

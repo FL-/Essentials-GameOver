@@ -6,28 +6,61 @@
 # game over when the player lose a battle instead of going to last healing spot.
 #
 #===============================================================================
-# For this script to work, put it above main script section. After that,
-# in PField_Visuals script section before line 
-# 'if $PokemonGlobal.pokecenterMapId && $PokemonGlobal.pokecenterMapId>=0' add
-# line 'pbLoadRpgxpScene(Scene_Gameover.new) if $game_switches[GAMEOVERSWITCH]'.
 #
-# If you wish to don't display the money lost message, in PokeBattle_Battle
-# script section, after line 'moneylost=0 if $game_switches[NO_MONEY_LOSS]' add line
-# 'moneylost=0 if (!canlose && $game_switches[GAMEOVERSWITCH])'.
+# To this script works, put it above main section OR convert into a plugin.
 #
-# This script is the RPG Maker XP Scene_Gameover with a single line
+# This script contains the RPG Maker XP Scene_Gameover with a single line
 # commented and two line added as you can see below, so you can define the
-# game Over ME and graphic in the RPG Maker XP system database (F9).
+# Game Over ME and graphic in the RPG Maker XP system database (F9).
 # Please note that Essentials uses a different screen size (the default is
 # 512x384), so the game over graphic must match.
 # 
 #===============================================================================
 
 # The switch number that need to be ON in order to allows a game over
-GAMEOVERSWITCH = 60 
+GAMEOVERSWITCH = 60
 
-# Using the equivalent of the commented line ($scene = Scene_Map.new)
-# throws some strange behaviors, so I prefer to raise a reset at scene end
+PluginManager.register({                                                 
+  :name    => "Game Over",                                        
+  :version => "1.1",                                                     
+  :link    => "https://www.pokecommunity.com/showthread.php?t=302197",             
+  :credits => "FL"
+})
+
+alias :_old_FL_pbStartOver :pbStartOver
+def pbStartOver(gameover=false)
+  if $game_switches[GAMEOVERSWITCH] #mod
+    $need_save_reload = true
+    pbLoadRpgxpScene(Scene_Gameover.new)
+    return
+  end
+  _old_FL_pbStartOver(gameover)
+end
+
+class PokeBattle_Battle
+  alias :_old_FL_pbLoseMoney :pbLoseMoney
+  def pbLoseMoney
+    return if $game_switches[GAMEOVERSWITCH] #mod
+    _old_FL_pbLoseMoney
+  end
+end
+
+# Small adjust to fix an Essentials V19 reload issue
+module SaveData
+  class << self
+    alias :_old_FL_load_all_values :load_all_values
+    def load_all_values(save_data)
+      if !$need_save_reload
+        _old_FL_load_all_values(save_data)
+        return
+      end
+      $need_save_reload = false
+      validate save_data => Hash
+      load_values(save_data)
+    end
+  end
+end
+$need_save_reload = false
 
 #==============================================================================
 # ** Scene_Gameover
@@ -63,6 +96,7 @@ class Scene_Gameover
         break
       end
     end
+    Audio.me_fade(800) # added line
     # Prepare for transition
     Graphics.freeze
     # Dispose of game over graphic
@@ -72,8 +106,7 @@ class Scene_Gameover
     Graphics.transition(40)
     # Prepare for transition
     Graphics.freeze
-    Audio.me_fade(800) # added line
-    raise Reset.new # added line
+    $scene = pbCallTitle # added line
     # If battle test
     if $BTEST
       $scene = nil
