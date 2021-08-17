@@ -6,30 +6,13 @@
 # game over when the player lose a battle instead of going to last healing spot.
 #
 #===============================================================================
-#
-# To this script works, put it above main section OR convert into a plugin.
-#
-# This script contains the RPG Maker XP Scene_Gameover with a single line
-# commented and two line added as you can see below, so you can define the
-# Game Over ME and graphic in the RPG Maker XP system database (F9).
-# Please note that Essentials uses a different screen size (the default is
-# 512x384), so the game over graphic must match.
-# 
-#===============================================================================
-
+  
 # The switch number that need to be ON in order to allows a game over
-GAMEOVERSWITCH = 60
-
-PluginManager.register({                                                 
-  :name    => "Game Over",                                        
-  :version => "1.1",                                                     
-  :link    => "https://www.pokecommunity.com/showthread.php?t=302197",             
-  :credits => "FL"
-})
+GAMEOVERSWITCH = 80
 
 alias :_old_FL_pbStartOver :pbStartOver
 def pbStartOver(gameover=false)
-  if $game_switches[GAMEOVERSWITCH] #mod
+  if $game_switches[GAMEOVERSWITCH]
     $need_save_reload = true
     pbLoadRpgxpScene(Scene_Gameover.new)
     return
@@ -40,7 +23,7 @@ end
 class PokeBattle_Battle
   alias :_old_FL_pbLoseMoney :pbLoseMoney
   def pbLoseMoney
-    return if $game_switches[GAMEOVERSWITCH] #mod
+    return if $game_switches[GAMEOVERSWITCH]
     _old_FL_pbLoseMoney
   end
 end
@@ -62,6 +45,8 @@ module SaveData
 end
 $need_save_reload = false
 
+# Below is the RPG Maker XP Scene_Gameover with a line commented, four lines
+# added and one changed.
 #==============================================================================
 # ** Scene_Gameover
 #------------------------------------------------------------------------------
@@ -103,10 +88,11 @@ class Scene_Gameover
     @sprite.bitmap.dispose
     @sprite.dispose
     # Execute transition
-    Graphics.transition(40)
+    Graphics.transition(1) # changed line (from 40 to 1)
     # Prepare for transition
     Graphics.freeze
-    $scene = pbCallTitle # added line
+    $game_screen.start_tone_change(Tone.new(-255, -255, -255), 0) # added line
+    $game_temp.to_title = true # added line
     # If battle test
     if $BTEST
       $scene = nil

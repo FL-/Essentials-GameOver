@@ -1,0 +1,4 @@
+﻿Name      = Game Over
+Version   = 1.2
+Website   = https://www.pokecommunity.com/showthread.php?t=302197
+Credits   = FL
