@@ -1,12 +1,12 @@
 # Game Over
-This script is for Pokémon Essentials. When a switch is on, its activates a game over when the player lose a battle instead of going to last healing spot.
+This plugin is for Pokémon Essentials. When a switch is on, its activates a game over when the player lose a battle instead of going to last healing spot.
 
 ## Screens
 ![](Screens/gif.gif)
 ![](Screens/screen.jpg)
 
 ## Compatibility
-Doesn't work on Essentials versions older than v19. To see other script versions, look at [all branches](../../branches/all).
+Doesn't work on Essentials versions older than v19. To see other Essentials versions, look at [all branches](../../branches/all).
 
 ## Installation
 - Follow FL's [Essentials plugin installation instructions](https://github.com/FL-/Misc/tree/main/Guides/EssentialsInstallPlugin).

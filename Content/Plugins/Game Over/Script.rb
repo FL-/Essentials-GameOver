@@ -2,7 +2,7 @@
 # * Game Over - by FL (Credits will be apreciated)
 #===============================================================================
 #
-# This script is for Pokémon Essentials. When a switch is on, its activates a
+# This script is for PokÃ©mon Essentials. When a switch is on, its activates a
 # game over when the player lose a battle instead of going to last healing spot.
 #
 #===============================================================================
@@ -37,6 +37,7 @@ module SaveData
         _old_FL_load_all_values(save_data)
         return
       end
+      $game_temp.to_title = false
       $need_save_reload = false
       validate save_data => Hash
       load_values(save_data)
