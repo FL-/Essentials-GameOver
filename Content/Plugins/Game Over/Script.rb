@@ -4,6 +4,7 @@
 #
 # This script is for Pokémon Essentials. When a switch is on, its activates a
 # game over when the player lose a battle instead of going to last healing spot.
+# Also, the Game Over event command back to work.
 #
 #===============================================================================
   
@@ -13,7 +14,6 @@ GAMEOVERSWITCH = 80
 alias :_old_FL_pbStartOver :pbStartOver
 def pbStartOver(gameover=false)
   if $game_switches[GAMEOVERSWITCH]
-    $need_save_reload = true
     pbLoadRpgxpScene(Scene_Gameover.new)
     return
   end
@@ -27,6 +27,8 @@ class PokeBattle_Battle
     _old_FL_pbLoseMoney
   end
 end
+
+$need_save_reload = false
 
 # Small adjust to fix an Essentials V19 reload issue
 module SaveData
@@ -44,9 +46,25 @@ module SaveData
     end
   end
 end
-$need_save_reload = false
 
-# Below is the RPG Maker XP Scene_Gameover with a line commented, four lines
+# Method created to Interpreter.command_end work in branch
+class Interpreter
+  def force_end
+    command_end
+    @list = [RPG::EventCommand.new, RPG::EventCommand.new]
+    @index = 0
+    @branch = [false]
+  end
+end
+
+def go_to_title
+  $need_save_reload = true
+  pbMapInterpreter.force_end if pbMapInterpreter
+  $game_screen.start_tone_change(Tone.new(-255, -255, -255), 0)
+  $game_temp.to_title = true
+end
+  
+# Below is the RPG Maker XP Scene_Gameover with a line commented, three lines
 # added and one changed.
 #==============================================================================
 # ** Scene_Gameover
@@ -92,8 +110,7 @@ class Scene_Gameover
     Graphics.transition(1) # changed line (from 40 to 1)
     # Prepare for transition
     Graphics.freeze
-    $game_screen.start_tone_change(Tone.new(-255, -255, -255), 0) # added line
-    $game_temp.to_title = true # added line
+    go_to_title # added line
     # If battle test
     if $BTEST
       $scene = nil

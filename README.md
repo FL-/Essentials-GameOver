@@ -1,5 +1,5 @@
 # Game Over
-This plugin is for Pokémon Essentials. When a switch is on, its activates a game over when the player lose a battle instead of going to last healing spot.
+This plugin is for Pokémon Essentials. When a switch is on, its activates a game over when the player lose a battle instead of going to last healing spot. Also, the Game Over event command back to work.
 
 ## Screens
 ![](Screens/gif.gif)
