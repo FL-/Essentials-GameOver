@@ -9,40 +9,33 @@
 #===============================================================================
   
 # The switch number that need to be ON in order to allows a game over
-GAMEOVERSWITCH = 80
+GAME_OVER_SWITCH = 80
 
 alias :_old_FL_pbStartOver :pbStartOver
 def pbStartOver(gameover=false)
-  if $game_switches[GAMEOVERSWITCH]
+  if $game_switches[GAME_OVER_SWITCH]
     pbLoadRpgxpScene(Scene_Gameover.new)
     return
   end
   _old_FL_pbStartOver(gameover)
 end
 
-class PokeBattle_Battle
+Battle = PokeBattle_Battle if !defined?(Battle)
+class Battle
   alias :_old_FL_pbLoseMoney :pbLoseMoney
   def pbLoseMoney
-    return if $game_switches[GAMEOVERSWITCH]
+    return if $game_switches[GAME_OVER_SWITCH]
     _old_FL_pbLoseMoney
   end
 end
 
-$need_save_reload = false
-
-# Small adjust to fix an Essentials V19 reload issue
-module SaveData
-  class << self
-    alias :_old_FL_load_all_values :load_all_values
-    def load_all_values(save_data)
-      if !$need_save_reload
-        _old_FL_load_all_values(save_data)
-        return
-      end
-      $game_temp.to_title = false
-      $need_save_reload = false
-      validate save_data => Hash
-      load_values(save_data)
+class Game_Temp
+  if !respond_to?(:to_title)
+    def to_title
+      return @title_screen_calling
+    end
+    def to_title=(value)
+      @title_screen_calling=value
     end
   end
 end
@@ -62,6 +55,24 @@ def go_to_title
   pbMapInterpreter.force_end if pbMapInterpreter
   $game_screen.start_tone_change(Tone.new(-255, -255, -255), 0)
   $game_temp.to_title = true
+end
+$need_save_reload = false
+
+# Small adjust to fix an Essentials V19 reload issue
+module SaveData
+  class << self
+    alias :_old_FL_load_all_values :load_all_values
+    def load_all_values(save_data)
+      if !$need_save_reload
+        _old_FL_load_all_values(save_data)
+        return
+      end
+      $game_temp.to_title = false
+      $need_save_reload = false
+      validate save_data => Hash
+      load_values(save_data)
+    end
+  end
 end
   
 # Below is the RPG Maker XP Scene_Gameover with a line commented, three lines
